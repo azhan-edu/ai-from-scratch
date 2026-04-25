@@ -1,0 +1,1 @@
+base on this /getTechStack-draft  make the short list of the tech stack split by areas
