@@ -13,4 +13,5 @@ Project related data
     --> .claude/results/getShortTechStack-resp.md  
 5) install agents and skills
     .claude/commands/installAgentsSkills.md
-
+6) CLAUDE.md
+ .claude/commands/addMainInstructions.md
