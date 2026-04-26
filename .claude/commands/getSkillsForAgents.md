@@ -10,3 +10,5 @@ https://mcp.directory/skills?q=Playwright
 https://mcp.directory/skills?q=Storybook
  Find 2 most installed skills for each agent from folder Agents
 and share the list in format: agent, skill name, short description, skill url
+
+Put result to Skills/_instructions/SKILLS-PER-AGENT.md
