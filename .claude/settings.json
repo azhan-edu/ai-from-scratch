@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p .claude/skills/software-architecture)",
+      "Bash(curl -L -o skill.zip \"https://mcp.directory/api/skills/download/658\")",
+      "Bash(unzip -o skill.zip -d .claude/skills/software-architecture)",
+      "Bash(mkdir -p .claude/skills/webapp-testing)",
+      "Bash(curl -L -o skill.zip \"https://mcp.directory/api/skills/download/47\")",
+      "Bash(unzip -o skill.zip -d .claude/skills/webapp-testing)"
+    ]
+  }
+}
