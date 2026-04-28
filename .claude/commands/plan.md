@@ -29,3 +29,9 @@ according to the descriptions:
 - @.claude/results/getShortTechStack-resp.md
  make a blank (hello world) application in the folder 'app'
  -->
+
+ <-- very 1st feature
+ here is the 1st feature definition: 
+change the text on the main page to "Hello, this is a new text" and change its color to green
+the feature should be implemented by @.claude/agents/orchestrator.md according to its ruls and instructions
+ -->

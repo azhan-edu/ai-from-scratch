@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/src/app/page.tsx",
+      "line": 1,
+      "message": "HomePage is correctly a Server Component (no 'use client' directive). RSC/client boundary is respected — no violation."
+    },
+    {
+      "severity": "minor",
+      "file": "app/src/app/__tests__/page.test.tsx",
+      "line": 1,
+      "message": "Test file placed under src/app/__tests__/ rather than co-located in a dedicated feature folder. For a page-level component this is acceptable, but future feature components should follow the src/components/features/<feature>/ pattern per CLAUDE.md §9."
+    }
+  ]
+}

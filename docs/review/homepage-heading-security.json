@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/src/app/page.tsx",
+      "line": 1,
+      "message": "No user input, no API calls, no dangerouslySetInnerHTML, no PII, no secrets. Static render only. No security concerns in scope."
+    }
+  ]
+}
