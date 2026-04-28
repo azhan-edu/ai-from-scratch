@@ -39,20 +39,22 @@ minimal interaction. Every technical decision should serve that goal.
 
 ### Tech stack
 
-```
-Frontend      Next.js 15 (App Router) · React 19 · TypeScript 5 strict
-Styling       Tailwind CSS 4 · shadcn/ui · Radix UI · Motion (Framer) 11
-State         Zustand 5 (UI) · TanStack Query 5 (server)
-Backend       tRPC 11 (internal) · Next.js Route Handlers (webhooks/public)
-Auth          Auth.js v5 (NextAuth)
-Database      PostgreSQL 16 (Aurora Serverless v2) · Drizzle ORM 0.30+
-Cache         Redis 7 — Upstash (edge) + ElastiCache (high RPS)
-Jobs          BullMQ 5
-AI            Anthropic Claude API (claude-sonnet-4-6 / opus-4-7 / haiku-4-5)
-Infra         AWS ECS Fargate · CloudFront · S3 · Secrets Manager
-CI/CD         GitHub Actions · AWS CodePipeline
-Quality       Vitest · Playwright · Storybook 8 · Biome · Turborepo · pnpm 9
-```
+> **Authoritative reference:** [.claude/results/getShortTechStack-resp.md](.claude/results/getShortTechStack-resp.md)
+> All tech stack decisions — library choices, versions, and area ownership — are resolved from
+> that file. When in doubt about which tool to use for a given concern, consult it first.
+
+| Area | Key choices |
+|------|-------------|
+| Frontend | Next.js 15 (App Router) · React 19 · TypeScript 5 strict |
+| Styling | Tailwind CSS 4 · shadcn/ui · Radix UI · Motion 11 |
+| State | Zustand 5 (client UI) · TanStack Query 5 (server state) |
+| Forms | React Hook Form · Zod |
+| Backend | tRPC 11 · BullMQ 5 · Auth.js v5 · Resend + React Email |
+| Data | PostgreSQL 16 (Aurora Serverless v2) · Drizzle ORM 0.30+ · Redis 7 (Upstash + ElastiCache) |
+| AI | Anthropic Claude API (`claude-sonnet-4-6` / `claude-opus-4-7` / `claude-haiku-4-5`) |
+| Infra | AWS ECS Fargate · CloudFront · S3 · Secrets Manager · GitHub Actions · AWS CodePipeline |
+| Observability | OpenTelemetry → Grafana + Tempo · Pino logs · Sentry · PostHog |
+| DX / Quality | Turborepo · pnpm 9 · Biome · Vitest · Playwright · Storybook 8 |
 
 ---
 
@@ -1213,51 +1215,42 @@ The problem this solves or the feature it enables. Link to ticket.
 
 ## 16. Agent Workflow
 
-When using Claude Code subagents, follow this sequence. Order matters — each agent's output
-feeds the next agent's input.
+**Every feature development request starts with the `orchestrator` agent.**
+Do not invoke individual agents directly — the orchestrator dispatches them in the
+correct order, enforces skip rules, handles the parallel review fan-out, and blocks
+merge on any BLOCK-level finding.
+
+Full runbook with per-phase prompt templates, entry/exit conditions, and skill
+assignments: [docs/agent-orchestration.md](docs/agent-orchestration.md)
+
+### Pipeline overview
 
 ```
-New feature request
+New feature request → orchestrator
        │
        ▼
-1.  ui-architect          App Router structure, RSC/client boundaries, folder layout
+1  component-spec-writer   spec (skip: pure backend)
+2  db-agent                schema + migration (skip: no DB changes)
+3  state-manager           Zustand slices, TanStack Query keys
+4  api-route-builder       tRPC procedures, Zod schemas, services
+5  component-builder       React + Tailwind + shadcn/ui (skip: pure backend)
+6  ci-agent                typecheck + lint gate
+7  test-engineer           Vitest unit + integration tests
+8  e2e-agent               Playwright + axe-core (skip: pure backend)
        │
        ▼
-2.  component-spec-writer Component API, variant list, state catalogue, responsive rules
-       │
+  ┌────┴──────────────────────────────────────┐
+  │  Phase 9 — run all 5 in PARALLEL          │
+  │  architecture-reviewer                    │
+  │  logic-reviewer                           │
+  │  security-reviewer                        │
+  │  style-reviewer                           │
+  │  dependency-reviewer                      │
+  └────┬──────────────────────────────────────┘
        ▼
-3.  db-agent              Drizzle schema changes, migrations, index analysis
-       │
-       ▼
-4.  state-manager         Zustand slices, TanStack Query keys, cache strategy
-       │
-       ▼
-5.  api-route-builder     tRPC procedures, Zod schemas, error codes
-       │
-       ▼
-6.  component-builder     React + Tailwind + shadcn/ui, Storybook stories, test stubs
-       │
-       ▼
-7.  test-engineer         Vitest unit + integration tests
-       │
-       ▼
-8.  e2e-agent             Playwright critical path test
-       │
-       ▼
-  ┌───┴────────────────────────────────────────────┐
-  │  Review pipeline — run all 5 in PARALLEL       │
-  │  9a. architecture-reviewer                     │
-  │  9b. logic-reviewer                            │
-  │  9c. security-reviewer                         │
-  │  9d. style-reviewer                            │
-  │  9e. dependency-reviewer                       │
-  └───┬────────────────────────────────────────────┘
-       │ JSON output from all 5
-       ▼
-10. review-synthesiser    Single consolidated PR report — BLOCK or PASS verdict
+10 review-synthesiser      BLOCK or PASS verdict
 ```
 
-Skip step 3 if no DB changes. Skip steps 2 and 6 for pure backend features.
 Always run the review pipeline — even for "small" changes.
 
 ---

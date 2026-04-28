@@ -6,10 +6,12 @@
       "Bash(unzip -o skill.zip -d .claude/skills/software-architecture)",
       "Bash(mkdir -p .claude/skills/webapp-testing)",
       "Bash(curl -L -o skill.zip \"https://mcp.directory/api/skills/download/47\")",
-      "Bash(unzip -o skill.zip -d .claude/skills/webapp-testing)"
+      "Bash(unzip -o skill.zip -d .claude/skills/webapp-testing)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('=== deps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['dependencies'].items\\(\\)]; print\\('=== devDeps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['devDependencies'].items\\(\\)]\")"
     ],
     "additionalDirectories": [
-      "/Users/anatoliizinhan/azhan-edu/ai-from-scratch/.claude"
+      "/Users/anatoliizinhan/azhan-edu/ai-from-scratch/.claude",
+      "/Users/anatoliizinhan/azhan-edu/ai-from-scratch"
     ]
   }
 }
