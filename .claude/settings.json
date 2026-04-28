@@ -7,7 +7,11 @@
       "Bash(mkdir -p .claude/skills/webapp-testing)",
       "Bash(curl -L -o skill.zip \"https://mcp.directory/api/skills/download/47\")",
       "Bash(unzip -o skill.zip -d .claude/skills/webapp-testing)",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('=== deps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['dependencies'].items\\(\\)]; print\\('=== devDeps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['devDependencies'].items\\(\\)]\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('=== deps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['dependencies'].items\\(\\)]; print\\('=== devDeps ==='\\); [print\\(f'{k}: {v}'\\) for k,v in d['devDependencies'].items\\(\\)]\")",
+      "Bash(pnpm create *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm remove *)",
+      "Bash(pnpm biome *)"
     ],
     "additionalDirectories": [
       "/Users/anatoliizinhan/azhan-edu/ai-from-scratch/.claude",

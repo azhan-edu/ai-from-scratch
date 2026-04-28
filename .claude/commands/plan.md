@@ -17,7 +17,15 @@ Project related data
  .claude/commands/addMainInstructions.md
 
 <--
+--
  i want you use Option D — A dedicated orchestrator agent
 system should use him to manage each developmemt request
 correct?
 -->
+
+<-- init-app
+according to the descriptions: 
+- @.claude/results/getArchVision-resp.md 
+- @.claude/results/getShortTechStack-resp.md
+ make a blank (hello world) application in the folder 'app'
+ -->
