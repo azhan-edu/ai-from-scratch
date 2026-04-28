@@ -15,3 +15,9 @@ Project related data
     .claude/commands/installAgentsSkills.md
 6) CLAUDE.md
  .claude/commands/addMainInstructions.md
+
+<--
+ i want you use Option D — A dedicated orchestrator agent
+system should use him to manage each developmemt request
+correct?
+-->
