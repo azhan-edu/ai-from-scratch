@@ -52,3 +52,38 @@ update app's current colorising according to this info
 /runFeature
 add e2e test for Home page
  -->
+
+ <-- IMPROVE CI
+ I want to improve my ci
+I would want to add 
+- linting before commit
+- github actions CI
+- Pre-push unit test hook
+- bundle size + Lighthouse
+- some quality and other gates
+provide a list of ideas what we can do in this area on this project
+
+push these ideas to docs/ideas folder
+ 
+------------------------
+
+i would also want to make a code review gate before commit
+how to implement that?
+push these ideas to docs/ideas folder
+
+=================
+base on the ideas in
+@docs/ideas/ci-improvements.md 
+implement 
+- 1. Husky + lint-staged for pre-commit
+- 2. Pre-commit TypeScript check (scoped)
+- 3. Pre-push unit tests
+- 4. Commit message linting with commitlint
+==>
+app/.husky/pre-commit	Runs lint-staged (biome on staged .ts/.tsx) + tsc --noEmit
+app/.husky/pre-push	    Runs vitest run before every push
+app/.husky/commit-msg	Runs commitlint against the commit message
+app/commitlint.config.cjs	Conventional commits + scopes from CLAUDE.md
+app/package.json	    Added prepare script + lint-staged config
+
+ -->
