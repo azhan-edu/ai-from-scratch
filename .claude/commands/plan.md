@@ -35,3 +35,10 @@ according to the descriptions:
 change the text on the main page to "Hello, this is a new text" and change its color to green
 the feature should be implemented by @.claude/agents/orchestrator.md according to its ruls and instructions
  -->
+
+N+1) update UI Agents Aaccording TO Design
+.claude/commands/updateAgentsAaccordingDesign.md
+<-- /runFeature 
+There is a design handoff in the folder docs/design.
+Update @CLAUDE.md and ui/ux related agents (ui-architect, style-reviever, component-builder, component-spec-writer) in the folder ./claude/agents use this folder as a source of rules, styles etc related to design
+-->

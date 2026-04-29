@@ -11,7 +11,10 @@
       "Bash(pnpm create *)",
       "Bash(pnpm add *)",
       "Bash(pnpm remove *)",
-      "Bash(pnpm biome *)"
+      "Bash(pnpm biome *)",
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm vitest *)",
+      "Bash(pnpm build *)"
     ],
     "additionalDirectories": [
       "/Users/anatoliizinhan/azhan-edu/ai-from-scratch/.claude",
