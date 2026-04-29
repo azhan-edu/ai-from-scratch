@@ -28,6 +28,12 @@ jobs:
       - run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+      - name: Start production server
+        run: pnpm start &
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - name: Wait for server to accept connections
+        run: npx wait-on --timeout 30000 http://localhost:3000
       - run: pnpm exec lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

@@ -1,9 +1,11 @@
 {
 	"ci": {
 		"collect": {
-			"startServerCommand": "pnpm start",
 			"url": ["http://localhost:3000"],
-			"numberOfRuns": 2
+			"numberOfRuns": 2,
+			"settings": {
+				"chromeFlags": "--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu"
+			}
 		},
 		"assert": {
 			"preset": "lighthouse:no-pwa",

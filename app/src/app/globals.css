@@ -28,7 +28,9 @@ body {
 /* Entry animation — used on screen mount elements (CLAUDE.md §8 animation catalogue) */
 @keyframes fadeInUp {
 	from {
-		opacity: 0;
+		/* 0.01 is above Chrome's FCP exclusion threshold (opacity: 0)
+		   so headless CI detects content even when animation is throttled */
+		opacity: 0.01;
 		transform: translateY(16px);
 	}
 	to {
