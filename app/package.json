@@ -17,8 +17,20 @@
 		"prepare": "cd .. && husky app/.husky"
 	},
 	"lint-staged": {
-		"*.{ts,tsx}": ["biome check --write --no-errors-on-unmatched"]
+		"*.{ts,tsx,json}": [
+			"biome check --write --no-errors-on-unmatched"
+		]
 	},
+	"bundlesize": [
+		{
+			"path": ".next/static/chunks/main-*.js",
+			"maxSize": "50 kB"
+		},
+		{
+			"path": ".next/static/chunks/pages/*.js",
+			"maxSize": "30 kB"
+		}
+	],
 	"dependencies": {
 		"next": "16.2.4",
 		"react": "19.2.4",
@@ -29,6 +41,7 @@
 		"@biomejs/biome": "^2.4.13",
 		"@commitlint/cli": "^20.5.2",
 		"@commitlint/config-conventional": "^20.5.0",
+		"@lhci/cli": "^0.15.1",
 		"@playwright/test": "^1.59.1",
 		"@tailwindcss/postcss": "^4",
 		"@testing-library/jest-dom": "^6.9.1",
@@ -37,8 +50,10 @@
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"@vitejs/plugin-react": "^6.0.1",
+		"bundlesize": "^0.18.2",
 		"husky": "^9.1.7",
 		"jsdom": "^29.1.0",
+		"knip": "^6.9.0",
 		"lint-staged": "^16.4.0",
 		"tailwindcss": "^4",
 		"typescript": "^5",

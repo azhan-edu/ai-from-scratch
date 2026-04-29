@@ -10,5 +10,19 @@ export default defineConfig({
 		// Exclude Playwright e2e specs — they use a different test runner and
 		// will error when Vitest tries to execute them (CLAUDE.md §11).
 		exclude: ["e2e/**", "node_modules/**"],
+		coverage: {
+			provider: "v8",
+			thresholds: {
+				lines: 80,
+				branches: 75,
+			},
+			exclude: [
+				"e2e/**",
+				"node_modules/**",
+				"**/*.config.*",
+				"**/test/**",
+				"src/test/**",
+			],
+		},
 	},
 });
