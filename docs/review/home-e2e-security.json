@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/playwright.config.ts",
+      "line": 30,
+      "message": "baseURL is hardcoded to http://localhost:3000. This is correct for local/CI use and carries no security concern, but worth noting that if this is ever pointed at a staging environment with real user data, the test suite would need to ensure no sensitive data assertions are made. Not applicable to this MVP scope."
+    }
+  ]
+}

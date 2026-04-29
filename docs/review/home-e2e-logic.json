@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/e2e/home-golden-path.spec.ts",
+      "line": 17,
+      "message": "The 'loads without a JavaScript error' test registers the pageerror listener AFTER goto('/') in beforeEach, meaning any errors thrown during the first navigation are missed. The test does a second goto('/') inside the test body which compensates, but the listener registration order is fragile. Consider moving the listener registration to the test body before any navigation, or using page.addInitScript to capture errors from page creation."
+    },
+    {
+      "severity": "minor",
+      "file": "app/e2e/home-golden-path.spec.ts",
+      "line": 75,
+      "message": "The surface card colour assertion hardcodes 'rgb(22, 20, 40)' as a comment-explained equivalent of #161428. The body background test similarly hardcodes 'rgb(13, 12, 21)'. These are correct per the design token registry and clearly commented — no logic error, just a note that if the token value changes the test will catch it correctly (desired behaviour)."
+    }
+  ]
+}

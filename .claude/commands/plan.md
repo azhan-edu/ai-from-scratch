@@ -47,3 +47,8 @@ Update @CLAUDE.md and ui/ux related agents (ui-architect, style-reviever, compon
  /runFeature 
 update app's current colorising according to this info
  -->
+
+ <--
+/runFeature
+add e2e test for Home page
+ -->
