@@ -1,0 +1,18 @@
+{
+  "reviewer": "dependency-reviewer",
+  "model": "claude-haiku-4-5-20251001",
+  "findings": [
+    {
+      "severity": "suggestion",
+      "file": "src/app/globals.css",
+      "line": 1,
+      "title": "Google Fonts loaded via external @import — no new npm package",
+      "category": "bundle",
+      "package": "Google Fonts (CDN)",
+      "detail": "Nunito is loaded via a Google Fonts CDN @import in globals.css. This introduces a render-blocking external request and a third-party font dependency. No npm package is added, so no CVE or licence risk. However, for production the Next.js font optimisation API (next/font/google) would eliminate the render-blocking request, self-host the font, and improve LCP.",
+      "fix": "Consider replacing the CSS @import with next/font/google in layout.tsx: import { Nunito } from 'next/font/google'; const nunito = Nunito({ weight: ['700','800','900'], subsets: ['latin'], variable: '--font-nunito' }); — then apply nunito.variable to <html>. This self-hosts the font and removes the external CDN dependency."
+    }
+  ],
+  "verdict": "PASS",
+  "summary": "No new npm packages introduced, no CVEs, no licence issues; one suggestion to replace CDN-based Google Fonts import with next/font/google for LCP improvement."
+}

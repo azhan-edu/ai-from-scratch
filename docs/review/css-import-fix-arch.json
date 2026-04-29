@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "src/app/layout.tsx",
+      "line": 15,
+      "message": "The Nunito font is now loaded via next/font/google and the CSS variable --font-nunito is injected on the <html> element via className. This is the correct Next.js App Router pattern for font loading. The variable propagates to all descendants through the cascade, so body and component references to var(--font-nunito) will resolve correctly. No architectural concerns."
+    }
+  ]
+}
