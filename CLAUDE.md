@@ -552,28 +552,115 @@ export async function getPetActivityStats(userId: string) {
 
 ## 8. Styling — Tailwind CSS 4 and Design Tokens
 
+> **Authoritative design reference:** `docs/design/README.md`
+> All token values — colours, typography, spacing, border-radius, shadows, and animations —
+> come from that file. When in doubt about any visual value, read it first before writing code.
+
 Visual consistency comes from a single token registry, not from individual developer decisions.
+The design is **dark-first** — the app background is nearly black (`#0d0c15`) and light mode
+is not in scope for MVP. All CSS custom properties must reflect the dark palette below.
 
-### Token system
+### Colour token registry
 
-```json
-// design-tokens/tokens.json
-{
-  "color": {
-    "pet-happy":    { "value": "#4ade80" },
-    "pet-hungry":   { "value": "#f87171" },
-    "pet-sleepy":   { "value": "#818cf8" },
-    "surface":      { "value": "#ffffff", "dark": "#0f172a" },
-    "surface-muted":{ "value": "#f8fafc", "dark": "#1e293b" }
-  },
-  "spacing": {
-    "pet-viewport": { "value": "320px" }
-  },
-  "radius": {
-    "pet-bubble": { "value": "1.5rem" }
-  }
+These are the only colours that may appear in component code. Never use an unlisted hex value.
+
+| Token name | Hex | Usage |
+|---|---|---|
+| `--color-bg` | `#0d0c15` | Page / app background |
+| `--color-surface` | `#161428` | Card / panel background |
+| `--color-elevated` | `#1e1b32` | Raised elements, inputs, icon buttons |
+| `--color-border` | `#2a2640` | All dividers and borders |
+| `--color-text` | `#ede9f8` | Primary text |
+| `--color-sub` | `#7b72a8` | Secondary / muted text, labels |
+| `--color-lavender` | `#a78bfa` | Primary accent — XP bar, buttons, highlights |
+| `--color-cyan` | `#22d3ee` | Secondary accent — XP gradient end, mini-game, hygiene bar |
+| `--color-hunger` | `#fb923c` | Hunger stat bar |
+| `--color-sleep` | `#818cf8` | Sleep stat bar |
+| `--color-happy` | `#34d399` | Happiness stat bar |
+| `--color-hygiene` | `#22d3ee` | Hygiene stat bar (same as cyan) |
+| `--color-pink` | `#f472b6` | Medicine action |
+| `--color-yellow` | `#facc15` | Study action |
+| `--color-red` | `#ef4444` | Critical state, reset CTA |
+
+Stat bars change colour when the stat drops below a threshold:
+- Below 20%: use `#ef4444` (red / critical)
+- Below 40%: use `#f59e0b` (amber / warning)
+- 40% and above: use the stat's own colour from the table above
+
+### Typography
+
+**Font family:** Nunito (Google Fonts). Load weights 700, 800, and 900 only. Apply via CSS variable:
+
+```css
+/* globals.css — load once, use everywhere */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+
+:root {
+  --font-nunito: 'Nunito', sans-serif;
 }
 ```
+
+**Never hard-code `font-family` in inline styles or component CSS.** Always reference `var(--font-nunito)`.
+
+| Role | Size | Weight | Notes |
+|---|---|---|---|
+| Screen titles | 22–28px | 900 | Colour `#ede9f8` |
+| Hero titles | 40px | 900 | Gradient text `#a78bfa → #22d3ee` via `-webkit-background-clip: text` |
+| Eyebrow / caps labels | 10px | 700 | Uppercase, letter-spacing 3–4px, colour `#7b72a8` |
+| Body / stat values | 12–14px | 700 | |
+| Action button labels | 11px | 700 | |
+| Stage / subtitle | 12px | 700 | Stage colour `#a78bfa` |
+
+### Spacing
+
+| Rule | Value |
+|---|---|
+| Page padding (horizontal) | `24px` |
+| Page top (safe area) | `48–52px` |
+| Card padding | `16–20px` |
+| Gap between action buttons | `7px` |
+
+### Border-radius
+
+| Element | Radius |
+|---|---|
+| Panels / cards | `20px` |
+| Buttons / inputs | `14–18px` |
+| Small chips / tags | `8–12px` |
+| Stats panel top edge | `20px 20px 0 0` |
+| Action bar bottom edge | `0 0 20px 20px` |
+
+Stats panel and action bar share one card: top half has radius `20px 20px 0 0`, bottom half has `0 0 20px 20px`. They must be implemented as a continuous surface, not two separate cards with a gap.
+
+### Shadows and glows
+
+```css
+/* Stat bar glow — applied to the fill element, not the track */
+box-shadow: 0 0 6px <barColor>60;
+
+/* Ambient pet glow disc — centred behind the sprite */
+background: radial-gradient(circle, #a78bfa14 0%, transparent 70%);
+
+/* Toast notification */
+box-shadow: 0 4px 20px #00000060;
+```
+
+### Animation catalogue
+
+Every animation name listed here has a specific, defined purpose. Do not rename them and do not
+invent new keyframe names without adding them to this table and to `docs/design/README.md`.
+
+| Name | Description | Default duration | Usage |
+|---|---|---|---|
+| `fadeInUp` | opacity 0→1 + translateY 16px→0 | 0.5–0.7s ease | Screen entry elements |
+| `float` | translateY 0↔−10px, infinite | 3.5s ease-in-out | Pet sprite on main screen |
+| `glow` | scale 1→1.25 + opacity 0.6→1, infinite | 3–4s | Ambient disc behind pet |
+| `eggBounce` | rotate ±7deg + scale 1→1.06, infinite | 2.4s ease-in-out | Welcome screen egg |
+| `pulse` | opacity 1→0.35, infinite | 1.4–2s | Zzz text, drool ellipse |
+| `toastIn` | opacity + scale 0.92→1 | 0.2s ease | Action toast notification |
+| `fishAppear` | scale 0.4→1 | 0.18s ease | Fish targets in mini-game |
+| `spin` | rotate 0→360deg, infinite | 2.5–4.1s linear | Evolution rings (alternating direction) |
+| Cat blink | eyeRy 7→1.2 then back, 140ms | Every ~3.5s (random) | CatSprite eyes, `useEffect` timer |
 
 ### Component class composition
 
@@ -582,9 +669,9 @@ Visual consistency comes from a single token registry, not from individual devel
 const cls = 'bg-' + color + ' px-' + size + ' rounded'
 
 // BAD — inline styles for values that should be tokens
-<div style={{ backgroundColor: '#4ade80', padding: '12px' }}>
+<div style={{ backgroundColor: '#a78bfa', padding: '12px' }}>
 
-// GOOD — cva for variant-based composition
+// GOOD — cva for variant-based composition, CSS variables for token colors
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clsx } from 'clsx'
 
@@ -593,10 +680,11 @@ const statusBar = cva(
   {
     variants: {
       mood: {
-        happy:   'bg-[var(--color-pet-happy)]',
-        hungry:  'bg-[var(--color-pet-hungry)]',
-        sleepy:  'bg-[var(--color-pet-sleepy)]',
-        neutral: 'bg-muted-foreground/40',
+        happy:   'bg-[var(--color-happy)]',
+        hungry:  'bg-[var(--color-hunger)]',
+        sleepy:  'bg-[var(--color-sleep)]',
+        hygiene: 'bg-[var(--color-hygiene)]',
+        neutral: 'bg-[var(--color-sub)]/40',
       },
     },
     defaultVariants: { mood: 'neutral' },
@@ -607,7 +695,7 @@ type StatusBarProps = VariantProps<typeof statusBar> & { value: number }
 
 export function StatusBar({ mood, value }: StatusBarProps) {
   return (
-    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-[var(--color-elevated)] rounded-full overflow-hidden">
       <div
         className={clsx(statusBar({ mood }))}
         style={{ width: `${value * 100}%` }}  // dynamic value — inline style is correct here
@@ -617,26 +705,26 @@ export function StatusBar({ mood, value }: StatusBarProps) {
 }
 ```
 
-### Dark mode
+### Screen structure
 
-```typescript
-// CSS custom properties in globals.css — the only place dark mode values live
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-}
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-}
+The app has exactly **6 defined screens**. All component work must map to one of these screens:
 
-// Components use Tailwind semantic classes that reference the variables
-<div className="bg-background text-foreground">  {/* adapts to dark mode automatically */}
+| Screen | Purpose |
+|---|---|
+| Welcome | Entry point — new game or continue save |
+| Select | Choose pet species + enter name |
+| Main | Core gameplay — view pet, stats, actions |
+| MiniGame | Tap-the-fish reflex game |
+| Evolution | Full-screen level-up celebration |
+| Settings | Pet info + reset game |
 
-// NEVER toggle dark mode in JavaScript
-document.documentElement.classList.toggle('dark')  // BAD — causes flash of wrong theme
-// Use next-themes with suppressHydrationWarning on <html> instead
-```
+Reference `docs/design/game-screens.jsx` for each screen's layout and component structure before
+implementing or speccing any new component.
+
+### Mobile-first sizing
+
+The app targets mobile screens. Max content width is **430px**. All layout decisions must work
+at 375px (iPhone SE) before considering larger viewports.
 
 ---
 
@@ -689,6 +777,7 @@ src/
   stores/                     # Zustand slices
 
 design-tokens/tokens.json     # Single source of truth for all design tokens
+docs/design/                  # High-fidelity design handoff (authoritative visual reference)
 docs/decisions/               # Architecture Decision Records (ADRs)
 ```
 

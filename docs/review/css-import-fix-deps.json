@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "src/app/layout.tsx",
+      "line": 2,
+      "message": "next/font/google is part of the Next.js package — no new dependency is added. Font files are downloaded at build time and served from the same origin, eliminating the runtime CDN dependency on fonts.googleapis.com. Bundle size impact is zero for JS; font files are served as static assets. This is strictly an improvement over the previous approach."
+    }
+  ]
+}

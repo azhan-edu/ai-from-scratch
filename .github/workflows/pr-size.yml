@@ -1,0 +1,28 @@
+name: PR Size Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-size:
+    name: PR Size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check PR size
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ADDITIONS=$(gh pr view ${{ github.event.pull_request.number }} --json additions -q '.additions')
+          DELETIONS=$(gh pr view ${{ github.event.pull_request.number }} --json deletions -q '.deletions')
+          CHANGED=$((ADDITIONS + DELETIONS))
+          echo "Lines changed: $CHANGED (additions: $ADDITIONS, deletions: $DELETIONS)"
+
+          if [ "$CHANGED" -gt 400 ]; then
+            echo "::warning::This PR changes $CHANGED lines. Consider splitting it into smaller PRs for easier review (threshold: 400 lines)."
+          else
+            echo "PR size is within the 400-line threshold."
+          fi

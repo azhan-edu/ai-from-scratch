@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pocket Pet Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0c15;
+      color: #ede9f8;
+      font-family: 'Nunito', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #root {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      background: #0d0c15;
+      position: relative;
+      overflow: hidden;
+    }
+
+    input, button { font-family: 'Nunito', sans-serif; }
+    input::placeholder { color: #2e2a48; }
+    button:focus { outline: none; }
+
+    /* ── Animations ─────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
+    }
+    @keyframes glow {
+      0%, 100% { transform: scale(1);   opacity: 0.6; }
+      50%       { transform: scale(1.25); opacity: 1; }
+    }
+    @keyframes eggBounce {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      20%       { transform: rotate(-7deg) scale(1.06); }
+      40%       { transform: rotate(7deg) scale(1.06); }
+      60%       { transform: rotate(-3deg) scale(1.02); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.92); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fishAppear {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+      to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+  integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+  crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+  integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+  crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+  integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+  crossorigin="anonymous"></script>
+
+<script type="text/babel" src="pet-sprite.jsx"></script>
+<script type="text/babel" src="game-screens.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ── Tweak defaults ────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "decaySpeed": "relaxed",
+  "accentColor": "#a78bfa",
+  "catMood": "sleepy"
+}/*EDITMODE-END*/;
+
+// ── Constants ─────────────────────────────────────────────
+const DECAY     = { hunger: 2.5, sleep: 2, happiness: 1.5, hygiene: 1 };
+const XP_THRESH = [60, 180];
+const SAVE_KEY  = 'ppc_v2';
+
+// ── Persistence ───────────────────────────────────────────
+const defaultPet = () => ({
+  name: 'Kitty', type: 'cat', stage: 0, xp: 0,
+  hunger: 85, sleep: 85, happiness: 85, hygiene: 85,
+  age: 0, born: Date.now(), lastTick: Date.now(), alive: true,
+});
+
+const loadPet = () => {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const pet = JSON.parse(raw);
+    const elapsed = (Date.now() - pet.lastTick) / 1000;
+    const ticks   = Math.floor(elapsed / (DECAY_MS / 1000));
+    if (ticks > 0) {
+      pet.hunger    = Math.max(0, pet.hunger    - DECAY.hunger    * ticks);
+      pet.sleep     = Math.max(0, pet.sleep     - DECAY.sleep     * ticks);
+      pet.happiness = Math.max(0, pet.happiness - DECAY.happiness * ticks);
+      pet.hygiene   = Math.max(0, pet.hygiene   - DECAY.hygiene   * ticks);
+      pet.age      += (ticks * DECAY_MS / 1000) / 86400;
+    }
+    pet.lastTick = Date.now();
+    return pet;
+  } catch { return null; }
+};
+
+const savePet = (pet) => {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ ...pet, lastTick: Date.now() })); } catch {}
+};
+
+// ── Tab title updater ─────────────────────────────────────
+const updateTitle = (pet) => {
+  if (!pet) return;
+  if (!pet.alive)         { document.title = `😢 ${pet.name} needs help!`; return; }
+  if (pet.hunger    < 20) { document.title = `🍎 ${pet.name} is hungry!`;  return; }
+  if (pet.sleep     < 20) { document.title = `💤 ${pet.name} is sleepy!`;  return; }
+  if (pet.happiness < 20) { document.title = `😢 ${pet.name} is sad!`;     return; }
+  document.title = `🐱 ${pet.name} · Pocket Pet`;
+};
+
+// ── App ───────────────────────────────────────────────────
+const App = () => {
+  const [t, setTweak]         = useTweaks(TWEAK_DEFAULTS);
+  const [screen,  setScreen]  = useState('welcome');
+  const [pet,     setPet]     = useState(defaultPet);
+  const [message, setMessage] = useState(null);
+  const [evo,     setEvo]     = useState(false);
+  const tickRef  = useRef(null);
+  const msgTimer = useRef(null);
+
+  // Decay interval based on speed tweak
+  const decayMs = t.decaySpeed === 'relaxed' ? 36000 : t.decaySpeed === 'fast' ? 5000 : 18000;
+
+  // Apply accent colour to shared C object so all screens pick it up
+  useEffect(() => {
+    if (window.C) window.C.lavender = t.accentColor;
+  }, [t.accentColor]);
+
+  // Restore save on mount
+  useEffect(() => {
+    const saved = loadPet();
+    if (saved) { setPet(saved); setScreen('main'); updateTitle(saved); }
+  }, []);
+
+  // Decay ticker — only runs on main screen; restarts when speed changes
+  useEffect(() => {
+    if (screen !== 'main') return;
+    tickRef.current = setInterval(() => {
+      setPet(prev => {
+        const clamp = (v, d) => Math.max(0, v - d);
+        const next = {
+          ...prev,
+          hunger:    clamp(prev.hunger,    DECAY.hunger),
+          sleep:     clamp(prev.sleep,     DECAY.sleep),
+          happiness: clamp(prev.happiness, DECAY.happiness),
+          hygiene:   clamp(prev.hygiene,   DECAY.hygiene),
+          age:       prev.age + (decayMs / 1000) / 86400,
+          lastTick:  Date.now(),
+        };
+        if (next.hunger === 0 && next.sleep === 0 && next.happiness < 5) next.alive = false;
+        if (next.stage < 2 && next.xp >= XP_THRESH[next.stage]) {
+          next.stage++;
+          setTimeout(() => setEvo(true), 400);
+        }
+        savePet(next);
+        updateTitle(next);
+        return next;
+      });
+    }, decayMs);
+    return () => clearInterval(tickRef.current);
+  }, [screen, decayMs]);
+
+  // Toast helper
+  const toast = (msg) => {
+    clearTimeout(msgTimer.current);
+    setMessage(msg);
+    msgTimer.current = setTimeout(() => setMessage(null), 2100);
+  };
+
+  // Action handler
+  const act = (id) => {
+    setPet(prev => {
+      const clamp = (v, d) => Math.min(100, Math.max(0, v + d));
+      let n = { ...prev };
+      switch (id) {
+        case 'feed':
+          n.hunger    = clamp(prev.hunger,     22);
+          n.happiness = clamp(prev.happiness,   5);
+          n.xp       += 5;  toast('🍎 Yummy!'); break;
+        case 'sleep':
+          n.sleep     = clamp(prev.sleep,      30);
+          n.happiness = clamp(prev.happiness,   5);
+          n.xp       += 5;  toast('💤 Sweet dreams!'); break;
+        case 'bathe':
+          n.hygiene   = clamp(prev.hygiene,    30);
+          n.happiness = clamp(prev.happiness,   5);
+          n.xp       += 5;  toast('🛁 Squeaky clean!'); break;
+        case 'medicine':
+          n.hunger    = clamp(prev.hunger,     15);
+          n.sleep     = clamp(prev.sleep,      15);
+          n.happiness = clamp(prev.happiness,  20);
+          n.hygiene   = clamp(prev.hygiene,    15);
+          n.alive     = true;
+          n.xp       += 8;  toast('💊 All better!'); break;
+        case 'study':
+          n.sleep     = clamp(prev.sleep,      -8);
+          n.happiness = clamp(prev.happiness,  -5);
+          n.xp       += 15; toast('📚 Getting smarter!'); break;
+      }
+      // Check evolution after action
+      if (n.stage < 2 && n.xp >= XP_THRESH[n.stage]) {
+        n.stage++;
+        setTimeout(() => setEvo(true), 300);
+      }
+      savePet(n);
+      updateTitle(n);
+      return n;
+    });
+  };
+
+  // Emotion resolver (tweak can override)
+  const getEmotion = () => {
+    if (t.catMood !== 'auto') return t.catMood;
+    if (!pet.alive)         return 'sick';
+    if (pet.sleep     < 20) return 'sleepy';
+    if (pet.hunger    < 20) return 'hungry';
+    if (pet.happiness < 20) return 'sad';
+    if (pet.happiness > 70) return 'happy';
+    return 'normal';
+  };
+
+  // Mini-game reward
+  const claimReward = (score) => {
+    if (score > 0) {
+      setPet(prev => {
+        const n = {
+          ...prev,
+          happiness: Math.min(100, prev.happiness + score * 2),
+          xp:        prev.xp + score,
+        };
+        if (n.stage < 2 && n.xp >= XP_THRESH[n.stage]) {
+          n.stage++;
+          setTimeout(() => setEvo(true), 600);
+        }
+        savePet(n);
+        updateTitle(n);
+        return n;
+      });
+      toast(`🎮 +${score * 2} happiness!`);
+    }
+    setScreen('main');
+  };
+
+  // ── Render ──────────────────────────────────────────────
+  const screenEl = (() => {
+    if (evo) return <EvolutionScreen pet={pet} onDone={() => setEvo(false)}/>;
+    switch (screen) {
+      case 'welcome':
+        return (
+          <WelcomeScreen
+            hasSave={!!localStorage.getItem(SAVE_KEY)}
+            onStart={() => setScreen('select')}
+            onContinue={() => {
+              const s = loadPet();
+              if (s) { setPet(s); setScreen('main'); updateTitle(s); }
+            }}
+          />
+        );
+      case 'select':
+        return (
+          <SelectScreen
+            onConfirm={(name) => {
+              const np = { ...defaultPet(), name };
+              savePet(np); setPet(np);
+              updateTitle(np); setScreen('main');
+            }}
+          />
+        );
+      case 'main':
+        return (
+          <MainScreen
+            pet={pet}
+            emotion={getEmotion()}
+            message={message}
+            onAct={act}
+            onMiniGame={() => setScreen('minigame')}
+            onSettings={() => setScreen('settings')}
+          />
+        );
+      case 'minigame':
+        return <MiniGameScreen onDone={claimReward}/>;
+      case 'settings':
+        return (
+          <SettingsScreen
+            pet={pet}
+            onBack={() => setScreen('main')}
+            onReset={() => {
+              localStorage.removeItem(SAVE_KEY);
+              setPet(defaultPet());
+              document.title = 'Pocket Pet Companion';
+              setScreen('welcome');
+            }}
+          />
+        );
+      default: return null;
+    }
+  })();
+
+  return (
+    <>
+      {screenEl}
+      <TweaksPanel>
+        <TweakSection label="Gameplay"/>
+        <TweakRadio
+          label="Decay Speed"
+          value={t.decaySpeed}
+          options={['relaxed','normal','fast']}
+          onChange={v => setTweak('decaySpeed', v)}
+        />
+        <TweakSection label="Visuals"/>
+        <TweakColor
+          label="Accent Colour"
+          value={t.accentColor}
+          onChange={v => { if (window.C) window.C.lavender = v; setTweak('accentColor', v); }}
+        />
+        <TweakSection label="Preview"/>
+        <TweakRadio
+          label="Cat Mood"
+          value={t.catMood}
+          options={['auto','happy','sad','sleepy']}
+          onChange={v => setTweak('catMood', v)}
+        />
+      </TweaksPanel>
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

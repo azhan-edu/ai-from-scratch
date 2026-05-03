@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "src/app/globals.css",
+      "line": 1,
+      "message": "The @import url() for Google Fonts is correctly removed. The remaining single @import 'tailwindcss' line is the only import, which is valid for Lightning CSS / Tailwind CSS 4. CSS custom properties, body styles, and @keyframes follow in the expected order per CLAUDE.md §8."
+    }
+  ]
+}

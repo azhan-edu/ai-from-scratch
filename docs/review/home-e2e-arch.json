@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/playwright.config.ts",
+      "line": 12,
+      "message": "The spread `...(process.env.CI ? { workers: 1 } : {})` is a valid exactOptionalPropertyTypes workaround but adds cognitive overhead. A cleaner alternative is defining a typed config object first and conditionally assigning workers before passing to defineConfig. No functional issue."
+    },
+    {
+      "severity": "minor",
+      "file": "app/e2e/home-golden-path.spec.ts",
+      "line": 1,
+      "message": "E2E tests live in app/e2e/ which matches the CLAUDE.md folder convention. No layer boundary violations — tests import only @playwright/test and @axe-core/playwright (external testing tools), never server or component internals. Architecture is correct."
+    }
+  ]
+}

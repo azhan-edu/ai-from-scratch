@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "src/app/layout.tsx",
+      "line": 7,
+      "message": "Fonts are now served through Next.js font optimisation (next/font/google), which self-hosts the font files at build time. This eliminates the need for fonts.googleapis.com and fonts.gstatic.com CSP directives that the old @import url() approach required. The Content-Security-Policy in next.config.ts can be tightened accordingly when it is implemented."
+    }
+  ]
+}

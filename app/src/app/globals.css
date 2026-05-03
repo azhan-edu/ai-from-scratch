@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+	/* Colour token registry — dark-first palette (CLAUDE.md §8) */
+	--color-bg: #0d0c15;
+	--color-surface: #161428;
+	--color-elevated: #1e1b32;
+	--color-border: #2a2640;
+	--color-text: #ede9f8;
+	--color-sub: #7b72a8;
+	--color-lavender: #a78bfa;
+	--color-cyan: #22d3ee;
+	--color-hunger: #fb923c;
+	--color-sleep: #818cf8;
+	--color-happy: #34d399;
+	--color-hygiene: #22d3ee;
+	--color-pink: #f472b6;
+	--color-yellow: #facc15;
+	--color-red: #ef4444;
+}
+
+body {
+	background: var(--color-bg);
+	color: var(--color-text);
+	font-family: var(--font-nunito);
+}
+
+/* Entry animation — used on screen mount elements (CLAUDE.md §8 animation catalogue) */
+@keyframes fadeInUp {
+	from {
+		/* 0.01 is above Chrome's FCP exclusion threshold (opacity: 0)
+		   so headless CI detects content even when animation is throttled */
+		opacity: 0.01;
+		transform: translateY(16px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

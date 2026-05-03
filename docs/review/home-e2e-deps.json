@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "app/package.json",
+      "line": 0,
+      "message": "@playwright/test@1.59.1 and @axe-core/playwright@4.11.2 are both devDependencies — correct, they do not contribute to the production bundle. @playwright/test is Apache-2.0 licensed; @axe-core/playwright is MPL-2.0. Both are compatible with this project. pnpm audit should be run to confirm no known CVEs, but these are well-maintained packages with a strong security track record."
+    }
+  ]
+}

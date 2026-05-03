@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "file": "src/app/globals.css",
+      "line": 17,
+      "message": "--color-hygiene and --color-cyan share the same hex value (#22d3ee). This is intentional per CLAUDE.md §8. A comment confirming the deliberate aliasing would prevent future confusion if one colour needs to diverge."
+    }
+  ]
+}
